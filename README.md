@@ -12,14 +12,14 @@ Aplikasi ini digunakan untuk mencatat dan memantau laporan permasalahan dari sta
 - Permasalahan perangkat medis
 
 ## 🖥️ Teknologi yang Digunakan
-- HTML + CSS + JavaScript (di jadikan satu dalam satu file)
-- LocalStorage (untuk menyimpan data di browser)
-- GitHub Pages (untuk hosting tanpa server)
+- HTML + CSS + JavaScript
+- LocalStorage 
+- GitHub Pages 
 
 ## 📦 Cara Akses
 Website ini dapat diakses melalui:
 
-👉 [https://rafkaalfazri.github.io/ticketing-app/](https://rafkaalfazri.github.io/ticketing-app/)
+https://rafkaalfazri.github.io/ticketing-app/
 
 ## ⚙️ Fitur Utama
 - Form input laporan: Subject, Description, dan Reporter
@@ -28,5 +28,3 @@ Website ini dapat diakses melalui:
 - Tombol hapus tiket
 - Penyimpanan otomatis di browser pengguna (tanpa database eksternal)
 
-## 📁 Struktur File
-index.html
