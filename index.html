@@ -1,255 +1,328 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHI Ticketing</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Cipta Hospital Indonesia Ticketing</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* 🎨 Color palette */
     :root {
-      --primary: #1976d2;
-      --primary-light: #63a4ff;
-      --primary-dark: #004ba0;
-      --bg-gradient-start: #e3f2fd;
-      --bg-gradient-end: #e8f5e9;
+      --p: #6200ea; --pd: #3500b3; --pl: #9d46ff;
+      --bg: #f6f6ff; --txt: #202124; --white: #fff;
+      --danger: #e53935; --open: #63a4ff;
+      --prog: #ffb74d; --done: #81c784;
     }
-
-    /* Global layout */
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: var(--txt);
+    }
     body {
-      font-family:'Segoe UI', Tahoma, sans-serif;
-      margin:0;
-      min-height:100vh;
-      background:linear-gradient(135deg,var(--bg-gradient-start),var(--bg-gradient-end));
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      padding:2rem 1rem;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
     }
-    h1 { margin:0 0 1rem; color:var(--primary-dark); }
-
-    /* Navigation */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.7rem 1rem;
+      background: linear-gradient(90deg, var(--p), var(--pd));
+      color: var(--white);
+    }
     nav {
-      display:flex;
-      gap:1rem;
-      margin-bottom:2rem;
+      display: flex; gap: 1rem;
     }
     nav a {
-      padding:.5rem 1rem;
-      border-radius:8px;
-      text-decoration:none;
-      color:var(--primary-dark);
-      background:rgba(25,118,210,.1);
-      cursor:pointer;
-      transition:background .2s;
-      font-weight:600;
+      color: inherit; text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
     }
-    nav a:hover { background:rgba(0,75,160,.15); }
-    nav a.active {
-      background:var(--primary-dark);
-      color:#fff;
+    nav a.active, nav a:hover {
+      background: rgba(255, 255, 255, 0.25);
     }
-
-    /* Sections */
-    section { display:none; width:100%; max-width:720px; }
-    section.active { display:block; }
-
-    /* Dashboard cards */
+    .brand {
+      font-weight: 600; font-size: 1.2rem;
+    }
+    #ticker {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 0.25rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    section { display: none; }
+    section.active { display: block; }
+    .btn {
+      border: none; border-radius: 8px;
+      padding: 0.55rem 1rem; font-size: 0.9rem;
+      cursor: pointer; background: var(--p); color: #fff;
+      transition: 0.2s;
+    }
+    .btn:hover { background: var(--pd); }
+    .outline {
+      background: transparent;
+      border: 2px solid currentColor;
+      color: inherit;
+    }
+    .hero {
+      background: linear-gradient(120deg, var(--pl), var(--p));
+      color: #fff; border-radius: 18px;
+      padding: 2rem 1.6rem; margin-bottom: 2rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    form#formT {
+      background: var(--white);
+      padding: 1.2rem; border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    input, textarea {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .ticket-box {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+    .ticket-item {
+      border-bottom: 1px solid #eee;
+      padding: 0.75rem 0;
+    }
+    .ticket-item:last-child { border-bottom: none; }
     .stats {
-      display:flex;
-      gap:1rem;
-      flex-wrap:wrap;
-      margin-bottom:2rem;
+      display: flex; gap: 1rem;
+      margin-bottom: 2rem;
     }
-    .stat-card {
-      flex:1 1 160px;
-      background:#fff;
-      border-radius:12px;
-      padding:1rem;
-      text-align:center;
-      box-shadow:0 3px 8px rgba(0,0,0,.05);
+    .card {
+      flex: 1 1 150px;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
     }
-    .stat-card h2 { margin:0 0 .3rem; font-size:2rem; color:var(--primary-dark); }
-
-    /* Form & ticket styles (re‑used from original) */
-    form {
-      background:#fff;
-      padding:1rem 1.2rem;
-      border-radius:12px;
-      box-shadow:0 4px 10px rgba(0,0,0,.08);
-      width:100%;
-      margin-bottom:1.5rem;
+    .card h2 { color: var(--pd); }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      color: #fff;
     }
-    form input,form textarea {
-      width:100%;
-      padding:.6rem .8rem;
-      margin:.4rem 0;
-      border:1px solid #cfd8dc;
-      border-radius:8px;
-      font-size:.95rem;
-      resize:vertical;
+    .open { background: var(--open); }
+    .in_progress { background: var(--prog); }
+    .resolved { background: var(--done); text-decoration: line-through; color: gray; }
+    #chartContainer {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
     }
-    button {
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      border-radius:8px;
-      padding:.6rem 1.2rem;
-      font-size:.95rem;
-      cursor:pointer;
-      transition:background .2s;
-    }
-    button:hover { background:var(--primary-dark); }
-    button.delete { background:#e53935; }
-    button.delete:hover { background:#b71c1c; }
-
-    .ticket {
-      border-radius:12px;
-      padding:.9rem 1rem;
-      margin:.6rem 0;
-      box-shadow:0 3px 8px rgba(0,0,0,.05);
-    }
-    .open { background:#fff8e1; }
-    .in_progress { background:#e3f2fd; }
-    .resolved {
-      background:#e8f5e9;
-      text-decoration:line-through;
-      color:#607d8b;
-    }
-    .actions { margin-top:.5rem; }
-    .actions button { margin-right:.4rem; }
   </style>
 </head>
 <body>
-  <h1>CHI Ticketing</h1>
-
-  <!-- 🌐 Navigation Bar -->
-  <nav>
-    <a data-page="dashboard" class="active">Dashboard</a>
-    <a data-page="ticketing">Ticketing</a>
-  </nav>
-
-  <!-- 📊 DASHBOARD SECTION -->
-  <section id="dashboard" class="active">
-    <div class="stats">
-      <div class="stat-card">
-        <h2 id="openCount">0</h2>
-        <p>Open</p>
+  <header>
+    <div class="brand"><h2>🛠️ Helpdesk-Cipta Hospital Indonesia</h2></div>
+    <nav>
+      <a href="#" data-pg="dashboard" class="active">Dashboard</a>
+      <a href="#" data-pg="ticket">Ticketing</a>
+      <a href="#" data-pg="history">Riwayat</a>
+      <a href="#" data-pg="report">Laporan</a>
+    </nav>
+    <div id="ticker" onclick="nav('ticket'); currentFilter='in_progress'; renderList();">⚙️ <span id="tickNum">0</span> in progress</div>
+  </header>
+  <main>
+    <section id="dashboard" class="active">
+      <div class="hero">
+        <h2>Selamat Datang di Helpdesk IT - Cipta Hospital Indonesia</h2>
+        <p>Platform ini membantu Anda dalam menyampaikan keluhan, permintaan, atau pelaporan gangguan sistem IT dengan cepat dan efisien.</p>
+        <p>Pantau status tiket Anda secara real-time dan pastikan kebutuhan teknis Anda ditangani oleh tim IT kami.</p>
+        <p style="font-style: italic;">"Kami hadir untuk memberikan dukungan teknologi terbaik demi pelayanan rumah sakit yang optimal."</p>
+        <div><button id="newBtn" class="btn">Buat Ticket</button> <button id="allBtn" class="btn outline">Lihat Semua</button></div>
       </div>
-      <div class="stat-card">
-        <h2 id="progressCount">0</h2>
-        <p>In&nbsp;Progress</p>
+      <div class="stats">
+        <div class="card"><h2 id="openC">0</h2>Open</div>
+        <div class="card"><h2 id="progC">0</h2>In Progress</div>
+        <div class="card"><h2 id="resC">0</h2>Resolved</div>
       </div>
-      <div class="stat-card">
-        <h2 id="resolvedCount">0</h2>
-        <p>Resolved</p>
+      <div class="recent">
+        <h3 id="recHead">Ticket Terbaru</h3>
+        <div id="rec"><em>Tidak ada</em></div>
       </div>
-    </div>
-    <button id="gotoTicketing">Kelola Ticket ➡️</button>
-  </section>
-
-  <!-- 🎫 TICKETING SECTION -->
-  <section id="ticketing">
-    <form id="fTicket">
-      <input id="subject" placeholder="Subject" required>
-      <textarea id="description" placeholder="Description" rows="3" required></textarea>
-      <input id="reporter" placeholder="Reporter" required>
-      <button type="submit">Buat Ticket</button>
-    </form>
-
-    <main>
-      <h2>Daftar Ticket</h2>
-      <div id="tickets"></div>
-    </main>
-  </section>
-
-<script>
-/***** 🔧 Data helpers *****/
-const LS_KEY = "chi_tickets";
-const getTickets = () => JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-const saveTickets = t => localStorage.setItem(LS_KEY, JSON.stringify(t));
-
-/***** 🌐 Simple SPA navigation *****/
-const navLinks = document.querySelectorAll('nav a');
-navLinks.forEach(link => link.addEventListener('click', () => showPage(link.dataset.page)));
-
-document.getElementById('gotoTicketing').addEventListener('click', () => showPage('ticketing'));
-
-function showPage(page){
-  // show/hide sections
-  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-  document.getElementById(page).classList.add('active');
-  // set active nav link
-  navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === page));
-  if(page === 'dashboard') refreshStats();
-}
-
-/***** 📊 Dashboard stats *****/
-function refreshStats(){
-  const tickets = getTickets();
-  document.getElementById('openCount').textContent      = tickets.filter(t => t.status === 'open').length;
-  document.getElementById('progressCount').textContent  = tickets.filter(t => t.status === 'in_progress').length;
-  document.getElementById('resolvedCount').textContent  = tickets.filter(t => t.status === 'resolved').length;
-}
-
-/***** 🎫 Ticketing logic *****/
-const container = document.getElementById("tickets");
-
-function listTickets(){
-  const tickets = getTickets();
-  if(!tickets.length){
-    container.innerHTML = "<em>Belum ada ticket</em>";
-    return;
-  }
-  container.innerHTML = tickets.map(t => `
-    <div class="ticket ${t.status}">
-      <strong>#${t.id} – ${t.subject}</strong><br>
-      ${t.description}<br>
-      <small>by ${t.reporter} | status: ${t.status}</small>
-      <div class="actions">
-        <button onclick="nextStatus(${t.id})">Status Berikutnya ➡️</button>
-        <button class="delete" onclick="del(${t.id})">Hapus 🗑️</button>
+    </section>
+    <section id="ticket">
+      <button id="backBtn" class="btn outline" style="margin-bottom:1rem">← Dashboard</button>
+      <div style="margin-bottom: 1rem">
+        <button class="btn filter" data-status="all">Semua</button>
+        <button class="btn filter" data-status="open">Open</button>
+        <button class="btn filter" data-status="in_progress">In Progress</button>
+        <button class="btn filter" data-status="resolved">Resolved</button>
       </div>
-    </div>
-  `).join("");
-}
+      <form id="formT">
+        <input id="sub" placeholder="Subject" required />
+        <input id="rep" placeholder="Reporter" required />
+        <textarea id="desc" rows="2" placeholder="Description" required></textarea>
+        <button class="btn">Buat Ticket</button>
+      </form>
+      <div class="ticket-box">
+        <h2>Daftar Ticket</h2>
+        <div id="list"><em>Belum ada</em></div>
+      </div>
+    </section>
+    <section id="report">
+      <h2 style="margin-bottom:1rem">Laporan Statistik Tiket</h2>
+      <div id="chartContainer">
+        <canvas id="pieChart"></canvas>
+      </div>
+    </section>
+    <section id="history">
+      <h2>Riwayat Semua Tiket</h2>
+      <div id="historyList"><em>Belum ada</em></div>
+    </section>
+  </main>
+  <script>
+    const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
+    const KEY = 'chi_tickets';
+    const listBox = $('#list');
+    const load = () => JSON.parse(localStorage.getItem(KEY) || '[]');
+    const save = d => localStorage.setItem(KEY, JSON.stringify(d));
+    let currentFilter = 'all';
 
-document.getElementById("fTicket").addEventListener("submit", e => {
-  e.preventDefault();
-  const tickets = getTickets();
-  tickets.unshift({
-    id: Date.now(),
-    subject: subject.value,
-    description: description.value,
-    reporter: reporter.value,
-    status: "open"
-  });
-  saveTickets(tickets);
-  e.target.reset();
-  listTickets();
-  refreshStats();
-});
+    function nav(id) {
+      $$('section').forEach(sec => sec.classList.toggle('active', sec.id === id));
+      $$('nav a').forEach(a => a.classList.toggle('active', a.dataset.pg === id));
+      if (id === 'dashboard') dash();
+      if (id === 'report') drawChart();
+      if (id === 'history') renderHistory();
+      if (id === 'ticket') renderList(); // ✅ Tambahan untuk sinkron ticketing
+    }
 
-function nextStatus(id){
-  const order = { open:"in_progress", in_progress:"resolved", resolved:"resolved" };
-  const tickets = getTickets();
-  const t = tickets.find(x => x.id === id);
-  if(t) t.status = order[t.status];
-  saveTickets(tickets);
-  listTickets();
-  refreshStats();
-}
+    $$('nav a').forEach(a => a.onclick = e => {
+      e.preventDefault(); nav(a.dataset.pg);
+    });
 
-function del(id){
-  const tickets = getTickets().filter(t => t.id !== id);
-  saveTickets(tickets);
-  listTickets();
-  refreshStats();
-}
+    $('#backBtn').onclick = () => nav('dashboard');
+    $('#newBtn').onclick = () => { nav('ticket'); $('#sub').focus(); };
+    $('#allBtn').onclick = () => { currentFilter = 'all'; renderList(); nav('ticket'); };
+    $$('.filter').forEach(btn => btn.onclick = () => {
+      currentFilter = btn.dataset.status;
+      renderList();
+    });
 
-// Initial render
-refreshStats();
-listTickets();
-</script>
+    $('#formT').onsubmit = e => {
+      e.preventDefault();
+      const data = load();
+      data.unshift({
+        id: Date.now(),
+        subject: $('#sub').value,
+        description: $('#desc').value,
+        reporter: $('#rep').value,
+        status: 'open'
+      });
+      save(data);
+      e.target.reset();
+      dash();
+      nav('dashboard');
+    };
+
+    function dash() {
+      const d = load();
+      const o = d.filter(t => t.status === 'open').length;
+      const p = d.filter(t => t.status === 'in_progress').length;
+      const r = d.filter(t => t.status === 'resolved').length;
+      $('#openC').textContent = o;
+      $('#progC').textContent = p;
+      $('#resC').textContent = r;
+      $('#tickNum').textContent = p;
+
+      const latest = d.slice(0, 5);
+      $('#recHead').textContent = `${latest.length} Ticket Terbaru`;
+      $('#rec').innerHTML = latest.length
+        ? latest.map(t => `<div class=item><span>#${t.id} – ${t.subject}</span><span class="badge ${t.status}">${t.status.replace('_', ' ')}</span></div>`).join('')
+        : '<em>Tidak ada</em>';
+
+      renderList(); // ✅ Supaya ticketing juga update
+    }
+
+    function renderList() {
+      const d = load();
+      const filtered = currentFilter === 'all' ? d : d.filter(t => t.status === currentFilter);
+      listBox.innerHTML = filtered.length ? filtered.map(t => {
+        let actions = '';
+        if (t.status === 'open') {
+          actions = `<button class="btn" onclick="changeStatus(${t.id})">Proses</button>`;
+        } else if (t.status === 'in_progress') {
+          actions = `<button class="btn" onclick="changeStatus(${t.id})">Selesai</button>`;
+        }
+        actions += ` <button class="btn outline" onclick="delTicket(${t.id})">Hapus</button>`;
+        return `<div class="ticket-item ${t.status}"><strong>#${t.id} – ${t.subject}</strong><br>${t.description}<br><small>${t.reporter} | ${t.status}</small><div>${actions}</div></div>`;
+      }).join('') : '<em>Belum ada</em>';
+    }
+
+    function renderHistory() {
+      const d = load();
+      const list = d.length ? d.map(t => {
+        return `<div class="ticket-item ${t.status}">
+          <strong>#${t.id} – ${t.subject}</strong><br>
+          ${t.description}<br>
+          <small>${t.reporter} | ${t.status.replace('_', ' ')}</small>
+        </div>`;
+      }).join('') : '<em>Belum ada</em>';
+      $('#historyList').innerHTML = list;
+    }
+
+    function changeStatus(id) {
+      const d = load();
+      const t = d.find(x => x.id === id);
+      if (!t) return;
+      if (t.status === 'open') t.status = 'in_progress';
+      else if (t.status === 'in_progress') t.status = 'resolved';
+      save(d);
+      dash();
+    }
+
+    function delTicket(id) {
+      if (!confirm("Yakin ingin menghapus ticket ini?")) return;
+      save(load().filter(t => t.id !== id));
+      dash();
+    }
+
+    function drawChart() {
+      const d = load();
+      const open = d.filter(t => t.status === 'open').length;
+      const in_progress = d.filter(t => t.status === 'in_progress').length;
+      const resolved = d.filter(t => t.status === 'resolved').length;
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      if (window.pie) window.pie.destroy();
+      window.pie = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: [`Open (${open})`, `In Progress (${in_progress})`, `Resolved (${resolved})`],
+          datasets: [{
+            data: [open, in_progress, resolved],
+            backgroundColor: ['#63a4ff', '#ffb74d', '#81c784'],
+          }]
+        },
+        options: {
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    dash();
+    renderList(); // ✅ tampilkan saat pertama kali
+  </script>
 </body>
 </html>
