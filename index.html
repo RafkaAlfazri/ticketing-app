@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHI Ticketing-System</title>
+  <title>CHI Ticketing</title>
   <style>
     /* 🎨 Color palette */
     :root {
@@ -13,7 +13,10 @@
       --bg-gradient-start: #e3f2fd;
       --bg-gradient-end: #e8f5e9;
     }
-    body{
+
+    /* Global layout */
+    * { box-sizing: border-box; }
+    body {
       font-family:'Segoe UI', Tahoma, sans-serif;
       margin:0;
       min-height:100vh;
@@ -23,57 +26,182 @@
       align-items:center;
       padding:2rem 1rem;
     }
-    h1{margin-bottom:1rem;color:var(--primary-dark);}
-    form{
+    h1 { margin:0 0 1rem; color:var(--primary-dark); }
+
+    /* Navigation */
+    nav {
+      display:flex;
+      gap:1rem;
+      margin-bottom:2rem;
+    }
+    nav a {
+      padding:.5rem 1rem;
+      border-radius:8px;
+      text-decoration:none;
+      color:var(--primary-dark);
+      background:rgba(25,118,210,.1);
+      cursor:pointer;
+      transition:background .2s;
+      font-weight:600;
+    }
+    nav a:hover { background:rgba(0,75,160,.15); }
+    nav a.active {
+      background:var(--primary-dark);
+      color:#fff;
+    }
+
+    /* Sections */
+    section { display:none; width:100%; max-width:720px; }
+    section.active { display:block; }
+
+    /* Dashboard cards */
+    .stats {
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      margin-bottom:2rem;
+    }
+    .stat-card {
+      flex:1 1 160px;
+      background:#fff;
+      border-radius:12px;
+      padding:1rem;
+      text-align:center;
+      box-shadow:0 3px 8px rgba(0,0,0,.05);
+    }
+    .stat-card h2 { margin:0 0 .3rem; font-size:2rem; color:var(--primary-dark); }
+
+    /* Form & ticket styles (re‑used from original) */
+    form {
       background:#fff;
       padding:1rem 1.2rem;
       border-radius:12px;
       box-shadow:0 4px 10px rgba(0,0,0,.08);
-      width:100%;max-width:640px;margin-bottom:1.5rem;
+      width:100%;
+      margin-bottom:1.5rem;
     }
-    form input,form textarea{
-      width:100%;padding:.6rem .8rem;margin:.4rem 0;
-      border:1px solid #cfd8dc;border-radius:8px;font-size:.95rem;resize:vertical;
+    form input,form textarea {
+      width:100%;
+      padding:.6rem .8rem;
+      margin:.4rem 0;
+      border:1px solid #cfd8dc;
+      border-radius:8px;
+      font-size:.95rem;
+      resize:vertical;
     }
-    button{
-      background:var(--primary);color:#fff;border:none;border-radius:8px;
-      padding:.6rem 1.2rem;font-size:.95rem;cursor:pointer;transition:background .2s;
+    button {
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      padding:.6rem 1.2rem;
+      font-size:.95rem;
+      cursor:pointer;
+      transition:background .2s;
     }
-    button:hover{background:var(--primary-dark);}
-    button.delete{background:#e53935;}button.delete:hover{background:#b71c1c;}
-    main{width:100%;max-width:680px;}
-    .ticket{border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;box-shadow:0 3px 8px rgba(0,0,0,.05);}
-    .open{background:#fff8e1;}
-    .in_progress{background:#e3f2fd;}
-    .resolved{background:#e8f5e9;text-decoration:line-through;color:#607d8b;}
-    .actions{margin-top:.5rem}.actions button{margin-right:.4rem}
+    button:hover { background:var(--primary-dark); }
+    button.delete { background:#e53935; }
+    button.delete:hover { background:#b71c1c; }
+
+    .ticket {
+      border-radius:12px;
+      padding:.9rem 1rem;
+      margin:.6rem 0;
+      box-shadow:0 3px 8px rgba(0,0,0,.05);
+    }
+    .open { background:#fff8e1; }
+    .in_progress { background:#e3f2fd; }
+    .resolved {
+      background:#e8f5e9;
+      text-decoration:line-through;
+      color:#607d8b;
+    }
+    .actions { margin-top:.5rem; }
+    .actions button { margin-right:.4rem; }
   </style>
 </head>
 <body>
-  <h1>Ticketing PT&nbsp;Cipta Hospital</h1>
+  <h1>CHI Ticketing</h1>
 
-  <form id="fTicket">
-    <input id="subject" placeholder="Subject" required>
-    <textarea id="description" placeholder="Description" rows="3" required></textarea>
-    <input id="reporter" placeholder="Reporter" required>
-    <button type="submit">Buat Ticket</button>
-  </form>
+  <!-- 🌐 Navigation Bar -->
+  <nav>
+    <a data-page="dashboard" class="active">Dashboard</a>
+    <a data-page="ticketing">Ticketing</a>
+  </nav>
 
-  <main>
-    <h2>Daftar Ticket</h2>
-    <div id="tickets"></div>
-  </main>
+  <!-- 📊 DASHBOARD SECTION -->
+  <section id="dashboard" class="active">
+    <div class="stats">
+      <div class="stat-card">
+        <h2 id="openCount">0</h2>
+        <p>Open</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="progressCount">0</h2>
+        <p>In&nbsp;Progress</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="resolvedCount">0</h2>
+        <p>Resolved</p>
+      </div>
+    </div>
+    <button id="gotoTicketing">Kelola Ticket ➡️</button>
+  </section>
+
+  <!-- 🎫 TICKETING SECTION -->
+  <section id="ticketing">
+    <form id="fTicket">
+      <input id="subject" placeholder="Subject" required>
+      <textarea id="description" placeholder="Description" rows="3" required></textarea>
+      <input id="reporter" placeholder="Reporter" required>
+      <button type="submit">Buat Ticket</button>
+    </form>
+
+    <main>
+      <h2>Daftar Ticket</h2>
+      <div id="tickets"></div>
+    </main>
+  </section>
 
 <script>
-const LS_KEY="chi_tickets";
-const getTickets=()=>JSON.parse(localStorage.getItem(LS_KEY)||"[]");
-const saveTickets=t=>localStorage.setItem(LS_KEY,JSON.stringify(t));
+/***** 🔧 Data helpers *****/
+const LS_KEY = "chi_tickets";
+const getTickets = () => JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+const saveTickets = t => localStorage.setItem(LS_KEY, JSON.stringify(t));
 
-const listTickets=()=>{
-  const container=document.getElementById("tickets");
-  const tickets=getTickets();
-  if(!tickets.length){container.innerHTML="<em>Belum ada ticket</em>";return;}
-  container.innerHTML=tickets.map(t=>`
+/***** 🌐 Simple SPA navigation *****/
+const navLinks = document.querySelectorAll('nav a');
+navLinks.forEach(link => link.addEventListener('click', () => showPage(link.dataset.page)));
+
+document.getElementById('gotoTicketing').addEventListener('click', () => showPage('ticketing'));
+
+function showPage(page){
+  // show/hide sections
+  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  // set active nav link
+  navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === page));
+  if(page === 'dashboard') refreshStats();
+}
+
+/***** 📊 Dashboard stats *****/
+function refreshStats(){
+  const tickets = getTickets();
+  document.getElementById('openCount').textContent      = tickets.filter(t => t.status === 'open').length;
+  document.getElementById('progressCount').textContent  = tickets.filter(t => t.status === 'in_progress').length;
+  document.getElementById('resolvedCount').textContent  = tickets.filter(t => t.status === 'resolved').length;
+}
+
+/***** 🎫 Ticketing logic *****/
+const container = document.getElementById("tickets");
+
+function listTickets(){
+  const tickets = getTickets();
+  if(!tickets.length){
+    container.innerHTML = "<em>Belum ada ticket</em>";
+    return;
+  }
+  container.innerHTML = tickets.map(t => `
     <div class="ticket ${t.status}">
       <strong>#${t.id} – ${t.subject}</strong><br>
       ${t.description}<br>
@@ -84,31 +212,43 @@ const listTickets=()=>{
       </div>
     </div>
   `).join("");
-};
+}
 
-document.getElementById("fTicket").addEventListener("submit",e=>{
+document.getElementById("fTicket").addEventListener("submit", e => {
   e.preventDefault();
-  const tickets=getTickets();
-  tickets.unshift({id:Date.now(),subject:subject.value,description:description.value,reporter:reporter.value,status:"open"});
+  const tickets = getTickets();
+  tickets.unshift({
+    id: Date.now(),
+    subject: subject.value,
+    description: description.value,
+    reporter: reporter.value,
+    status: "open"
+  });
   saveTickets(tickets);
   e.target.reset();
   listTickets();
+  refreshStats();
 });
 
-const nextStatus=id=>{
-  const order={open:"in_progress",in_progress:"resolved",resolved:"resolved"};
-  const tickets=getTickets();
-  const t=tickets.find(x=>x.id===id);
-  if(t) t.status=order[t.status];
+function nextStatus(id){
+  const order = { open:"in_progress", in_progress:"resolved", resolved:"resolved" };
+  const tickets = getTickets();
+  const t = tickets.find(x => x.id === id);
+  if(t) t.status = order[t.status];
   saveTickets(tickets);
   listTickets();
-};
-const del=id=>{
-  const tickets=getTickets().filter(t=>t.id!==id);
-  saveTickets(tickets);
-  listTickets();
-};
+  refreshStats();
+}
 
+function del(id){
+  const tickets = getTickets().filter(t => t.id !== id);
+  saveTickets(tickets);
+  listTickets();
+  refreshStats();
+}
+
+// Initial render
+refreshStats();
 listTickets();
 </script>
 </body>
