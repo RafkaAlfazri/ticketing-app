@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHI Ticketing – Tanpa Database</title>
+  <style>
+    /* 🎨 Color palette */
+    :root {
+      --primary: #1976d2;
+      --primary-light: #63a4ff;
+      --primary-dark: #004ba0;
+      --bg-gradient-start: #e3f2fd;
+      --bg-gradient-end: #e8f5e9;
+    }
+    body{
+      font-family:'Segoe UI', Tahoma, sans-serif;
+      margin:0;
+      min-height:100vh;
+      background:linear-gradient(135deg,var(--bg-gradient-start),var(--bg-gradient-end));
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:2rem 1rem;
+    }
+    h1{margin-bottom:1rem;color:var(--primary-dark);}
+    form{
+      background:#fff;
+      padding:1rem 1.2rem;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+      width:100%;max-width:640px;margin-bottom:1.5rem;
+    }
+    form input,form textarea{
+      width:100%;padding:.6rem .8rem;margin:.4rem 0;
+      border:1px solid #cfd8dc;border-radius:8px;font-size:.95rem;resize:vertical;
+    }
+    button{
+      background:var(--primary);color:#fff;border:none;border-radius:8px;
+      padding:.6rem 1.2rem;font-size:.95rem;cursor:pointer;transition:background .2s;
+    }
+    button:hover{background:var(--primary-dark);}
+    button.delete{background:#e53935;}button.delete:hover{background:#b71c1c;}
+    main{width:100%;max-width:680px;}
+    .ticket{border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;box-shadow:0 3px 8px rgba(0,0,0,.05);}
+    .open{background:#fff8e1;}
+    .in_progress{background:#e3f2fd;}
+    .resolved{background:#e8f5e9;text-decoration:line-through;color:#607d8b;}
+    .actions{margin-top:.5rem}.actions button{margin-right:.4rem}
+  </style>
+</head>
+<body>
+  <h1>Ticketing PT&nbsp;Cipta Hospital</h1>
+
+  <form id="fTicket">
+    <input id="subject" placeholder="Subject" required>
+    <textarea id="description" placeholder="Description" rows="3" required></textarea>
+    <input id="reporter" placeholder="Reporter" required>
+    <button type="submit">Buat Ticket</button>
+  </form>
+
+  <main>
+    <h2>Daftar Ticket</h2>
+    <div id="tickets"></div>
+  </main>
+
+<script>
+const LS_KEY="chi_tickets";
+const getTickets=()=>JSON.parse(localStorage.getItem(LS_KEY)||"[]");
+const saveTickets=t=>localStorage.setItem(LS_KEY,JSON.stringify(t));
+
+const listTickets=()=>{
+  const container=document.getElementById("tickets");
+  const tickets=getTickets();
+  if(!tickets.length){container.innerHTML="<em>Belum ada ticket</em>";return;}
+  container.innerHTML=tickets.map(t=>`
+    <div class="ticket ${t.status}">
+      <strong>#${t.id} – ${t.subject}</strong><br>
+      ${t.description}<br>
+      <small>by ${t.reporter} | status: ${t.status}</small>
+      <div class="actions">
+        <button onclick="nextStatus(${t.id})">Status Berikutnya ➡️</button>
+        <button class="delete" onclick="del(${t.id})">Hapus 🗑️</button>
+      </div>
+    </div>
+  `).join("");
+};
+
+document.getElementById("fTicket").addEventListener("submit",e=>{
+  e.preventDefault();
+  const tickets=getTickets();
+  tickets.unshift({id:Date.now(),subject:subject.value,description:description.value,reporter:reporter.value,status:"open"});
+  saveTickets(tickets);
+  e.target.reset();
+  listTickets();
+});
+
+const nextStatus=id=>{
+  const order={open:"in_progress",in_progress:"resolved",resolved:"resolved"};
+  const tickets=getTickets();
+  const t=tickets.find(x=>x.id===id);
+  if(t) t.status=order[t.status];
+  saveTickets(tickets);
+  listTickets();
+};
+const del=id=>{
+  const tickets=getTickets().filter(t=>t.id!==id);
+  saveTickets(tickets);
+  listTickets();
+};
+
+listTickets();
+</script>
+</body>
+</html>
