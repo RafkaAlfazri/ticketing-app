@@ -1,30 +1,34 @@
-# 💼 Aplikasi Ticketing – PT Cipta Hospital Indonesia
+# Helpdesk - Cipta Hospital Indonesia 🛠️
 
-Website ini merupakan implementasi dari sistem pelaporan masalah (ticketing system) berbasis web sederhana untuk rumah sakit PT Cipta Hospital Indonesia.
+Aplikasi web sederhana untuk sistem ticketing dan laporan Helpdesk IT Rumah Sakit berbasis **HTML + JavaScript (Vanilla)**.  
+Tidak menggunakan backend server — semua data disimpan di **localStorage browser**.
 
-## 📌 Tujuan Sistem
-Aplikasi ini digunakan untuk mencatat dan memantau laporan permasalahan dari staf rumah sakit, seperti:
+## 🔧 Fitur
 
-- Komputer tidak bisa login
-- Printer error
-- Jaringan internet lambat
-- Gagal mengakses aplikasi
-- Permasalahan perangkat medis
+- 📋 Pembuatan tiket oleh user
+- 📊 Statistik dan status tiket (Open, In Progress, Resolved)
+- ✅ Perubahan status tiket secara bertahap
+- 🧾 Riwayat tiket
+- 📈 Grafik pie chart status tiket
+- 🔍 Filter berdasarkan status tiket
+- 📁 Tidak butuh database atau hosting backend
 
-## 🖥️ Teknologi yang Digunakan
-- HTML + CSS + JavaScript
-- LocalStorage 
-- GitHub Pages 
+## 📄 Halaman
 
-## 📦 Cara Akses
-Website ini dapat diakses melalui:
+- **Dashboard**: Menampilkan ringkasan dan tiket terbaru
+- **Ticketing**: Form dan daftar tiket aktif
+- **Riwayat**: Daftar semua tiket yang pernah dibuat
+- **Laporan**: Statistik dalam bentuk pie chart
 
-https://rafkaalfazri.github.io/ticketing-app/
+## 🚀 Deploy via GitHub Pages
 
-## ⚙️ Fitur Utama
-- Form input laporan: Subject, Description, dan Reporter
-- Tabel daftar laporan (ticket)
-- Pengubahan status (Pending → Proses → Selesai)
-- Tombol hapus tiket
-- Penyimpanan otomatis di browser pengguna (tanpa database eksternal)
+Untuk menampilkan aplikasi ini secara online:
+
+1. Upload semua file ke repository GitHub
+2. Pastikan file utama bernama `index.html` di root repo
+3. Masuk ke pengaturan repo:
+   - Buka tab **Settings > Pages**
+   - Pilih source: `Deploy from a branch`
+   - Branch: `main` (atau `master`), folder: `/root`
+4. Klik **Save**, lalu tunggu link GitHub Pages aktif (misalnya: `https://username.github.io/nama-repo/`)
 
