@@ -12,7 +12,7 @@ Aplikasi ini digunakan untuk mencatat dan memantau laporan permasalahan dari sta
 - Permasalahan perangkat medis
 
 ## 🖥️ Teknologi yang Digunakan
-- HTML + CSS + JavaScript
+- HTML + CSS + JavaScript (di jadikan satu dalam satu file)
 - LocalStorage (untuk menyimpan data di browser)
 - GitHub Pages (untuk hosting tanpa server)
 
